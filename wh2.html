@@ -169,7 +169,14 @@ d3.csv(url, function(error, data){
 	    .attr("dx", 10)
 	    .attr("dy", "1em");
 
+	var focusLine = svg.append("g")
+	    .attr("class", "focusLine")
+	    .style("display", "none");
 
+	var ver_line = focusLine.append("line")
+	    .style("stroke-dasharray", ("3,3"))
+	    .attr("stroke-width", 1)
+	    .attr("stroke", "white");
 
 	var tracker = svg.append("rect")
 	    .attr("class", "overlay")
@@ -179,9 +186,11 @@ d3.csv(url, function(error, data){
 	    .attr("height", height - padding.top - padding.bottom)
 	    .on("mouseover", function(){
 		focusDot.style("display", null);
+		focusLine.style("display", null);
 	    })
 	    .on("mouseout", function(){
 		focusDot.style("display", "none");
+		focusLine.style("display", "none");
 	    })
 	    .on("mousemove", mousemove);
 
@@ -206,6 +215,11 @@ d3.csv(url, function(error, data){
 	    focusDot.select("text")
 		.text("Year:" + x1 + ", Num:" + y1)
 		.attr("fill", "white");
+
+	    ver_line.attr("x1", focusX)
+		.attr("y1", padding.top)
+		.attr("x2", focusX)
+		.attr("y2", height - padding.bottom);
 
 	}
 	
