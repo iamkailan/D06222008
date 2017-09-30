@@ -2,6 +2,22 @@
 <head>
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <meta charset="uft-8">
+    <style>
+	body{
+	    background-color: black;
+	}
+	.axis line{
+	    fill: none;
+	    stroke: lightblue;
+	}
+	.axis path{
+	    fill: none;
+	    stroke: lightblue;
+	}
+	.axis text{
+	    fill: lightblue;
+	}	
+    </style>
 </head>
 <body>
 
@@ -79,12 +95,13 @@ d3.csv(url, function(error, data){
 	var lineChart4 = svg.append("g").append("path").attr("class", "line").attr("stroke", "green").attr("stroke-width", 3).attr("fill", "none").attr("d", function(d){ return line_lecturer(data); });
 
 	//Axis
+	// Tick format: http://www.oxxostudio.tw/articles/201501/svg-d3-12-formatting.html
+	
 	var yAxis = d3.axisLeft(yScale);
 	var xAxis = d3.axisBottom(xScale);
-	var XaxisAppend = svg.append("g").attr("class", "axis").attr("transform", "translate(0, "+(h-n)+")").call(xAxis);
+	var XaxisAppend = svg.append("g").attr("class", "axis").attr("transform", "translate(0, "+(h-n)+")").call(xAxis.tickFormat(d3.format("d")));
 	var YaxisAppend = svg.append("g").attr("class", "axis").attr("transform", "translate("+n+", 0)").call(yAxis);
 		
-		//tickFormat(d3.formatPrefix(".0s", 1e6)));
 
 	
 	});
