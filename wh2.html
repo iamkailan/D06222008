@@ -1,0 +1,80 @@
+<html>
+<head>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <meta charset="uft-8">
+</head>
+<body>
+
+<script>
+url = "https://ntu-csx-d3js.github.io/D06222008/hw2.csv"
+d3.csv(url, function(error, data){
+	//console.log(data);
+	if(error){
+	    console.log(error);
+	}
+	
+	var num_professor = [];
+	var num_associate = [];
+	var num_assistant = [];
+	var num_lecturer = [];
+	
+	//  Fixed issue: return wrong value of d3.max and d3.min 
+	//  https://stackoverflow.com/questions/30874617/d3-max-didnt-get-the-correct-value
+       	
+	    var num_professor = data[i].professor;
+	    var num_associate = data[i].associate;
+	    var num_assistant = data[i].assistant;
+	    var num_lecturer = data[i].lecturer;
+
+	for ( var i = 0; i < data.length; i++){
+	    num_professor.push(parseInt(data[i].professor));
+	    num_associate.push(parseInt(data[i].associate));
+	    num_assistant.push(parseInt(data[i].assistant));
+	    num_lecturer.push(parseInt(data[i].lecturer));
+	}
+	console.log(d3.max(num_professor));
+		
+	var w = 800; //定義寬
+	var h = 500; //定義高
+	var m = 20; //定義邊界
+	var n = 50; //定義 Axis 邊界
+	var Ymax = d3.max(data, function(d){ return d.professor; });
+	var Ymin = d3.min(data, function(d){ return d.assistant; });
+	var Xmax = d3.max(data, function(d){ return d.year; });
+	var Xmin = d3.min(data, function(d){ return d.year; });
+
+	console.log(Ymax, Ymin, Xmax, Xmin);
+	//console.log(data.professor.length);
+	//建立 x 軸的尺度
+	var xScale = d3.scaleLinear().domain([Xmin, Xmax]).range([n, w-n]);
+	//建立 y 軸的尺度
+	var yScale = d3.scaleLinear().domain([Ymin, Ymax]).range([h-n, n]);	
+	//D3.js line generator
+	var lineT = d3.line().x(function(d){ return xScale(d.year); }).y(function(d){ return yScale(d.professor); });
+	var lineB = d3.line().x(function(d){ return xScale(d.year); }).y(function(d){ return yScale(d.associate); });
+	var lineS = d3.line().x(function(d){ return xScale(d.year); }).y(function(d){ return yScale(d.assistant); });
+	var lineO = d3.line().x(function(d){ return xScale(d.year); }).y(function(d){ return yScale(d.lecturer); });
+
+	var svg = d3.select('body').append('svg').attr('width', w).attr('height', h);
+
+	var lineChart1 = svg.append("g").append("path").attr("class", "line").attr("stroke", "red").attr("stroke-width", 3).attr("fill", "none").attr("d", function(d){ return lineT(data); });
+	var lineChart2 = svg.append("g").append("path").attr("class", "line").attr("stroke", "blue").attr("stroke-width", 3).attr("fill", "none").attr("d", function(d){ return lineB(data); });
+	var lineChart3 = svg.append("g").append("path").attr("class", "line").attr("stroke", "black").attr("stroke-width", 3).attr("fill", "none").attr("d", function(d){ return lineS(data); });
+	var lineChart4 = svg.append("g").append("path").attr("class", "line").attr("stroke", "green").attr("stroke-width", 3).attr("fill", "none").attr("d", function(d){ return lineO(data); });
+
+	//Axis
+	var yAxis = d3.axisLeft(yScale);
+	var xAxis = d3.axisBottom(xScale);
+	var XaxisAppend = svg.append("g").attr("class", "axis").attr("transform", "translate(0, "+(h-n)+")").call(xAxis);
+	var YaxisAppend = svg.append("g").attr("class", "axis").attr("transform", "translate("+n+", 0)").call(yAxis);
+		
+		//tickFormat(d3.formatPrefix(".0s", 1e6)));
+
+	
+	});
+
+
+</script>
+
+</body>
+</html>
