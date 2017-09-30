@@ -43,7 +43,7 @@ d3.csv(url, function(error, data){
 	var num_assistant = [];
 	var num_lecturer = [];	
 	
-	var colorset = ["#29b6f6", "#009872", "#da534d", "#E34247", "#FEB32E", "#3bcec0"];
+	var colorset = ["#29b6f6", "#E34247", "#FEB32E", "#3bcec0"];
 		
 	//  Fixed issue: return wrong value of d3.max and d3.min 
 	//  https://stackoverflow.com/questions/30874617/d3-max-didnt-get-the-correct-value
@@ -105,15 +105,15 @@ d3.csv(url, function(error, data){
 	    .attr("d", function(d){ return line_professor(data); });
 	var lineChart2 = svg.append("g").append("path")
 	    .attr("class", "line")
-	    .attr("stroke", colorset[3])
+	    .attr("stroke", colorset[1])
 	    .attr("d", function(d){ return line_associate(data); });
 	var lineChart3 = svg.append("g").append("path")
 	    .attr("class", "line")
-	    .attr("stroke", colorset[4])
+	    .attr("stroke", colorset[2])
 	    .attr("d", function(d){ return line_assistant(data); });
 	var lineChart4 = svg.append("g").append("path")
 	    .attr("class", "line")
-	    .attr("stroke", colorset[5])
+	    .attr("stroke", colorset[3])
 	    .attr("d", function(d){ return line_lecturer(data); });
 
 	//Axis
