@@ -24,6 +24,14 @@
 	.line{
 	    fill: none;
 	    stroke-width: 3;
+	}
+	.overlay{
+	    fill: none;
+	    pointer-events: all;
+	}
+	.text{
+	    fill: white;
+	    font-size: 12;
 	}		
     </style>
 </head>
@@ -55,10 +63,15 @@ d3.csv(url, function(error, data){
 	    num_lecturer.push(parseInt(data[i].lecturer));
 	}
 		
-	var w = 800; //定義寬
-	var h = 500; //定義高
-	var m = 20; //定義邊界
-	var n = 50; //定義 Axis 邊界
+	var width = 800; //定義寬
+	var height = 500; //定義高
+	//var m = 20; //定義邊界
+	//var n = 50; //定義 Axis 邊界
+	
+	var padding = { top: 50, right: 50, bottom: 50, left: 50};
+	var canvas_width = width - padding.left - padding.right;
+	var canvas_height = height - padding.top - padding.bottom;
+
 	var Ymax = d3.max(num_professor);
 	var Ymin = d3.min(num_assistant);
 	var Xmax = d3.extent(years)[1];
@@ -72,9 +85,11 @@ d3.csv(url, function(error, data){
 	//console.log(Ymax, Ymin, Xmax, Xmin);
 	//console.log(data.professor.length);
 	//建立 x 軸的尺度
-	var xScale = d3.scaleLinear().domain([Xmin, Xmax]).range([n, w-n]);
+	//var xScale = d3.scaleLinear().domain([Xmin, Xmax]).range([n, w-n]);
+
+	var xScale = d3.scaleLinear().domain([Xmin, Xmax]).range([0, canvas_width]);
 	//建立 y 軸的尺度
-	var yScale = d3.scaleLinear().domain([Ymin, Ymax]).range([h-n, n]);	
+	var yScale = d3.scaleLinear().domain([Ymin, Ymax]).range([canvas_height, 0]);	
 	//D3.js line generator
 	
 	// Note: interpolate syntax is different between v3 & v4
@@ -97,7 +112,9 @@ d3.csv(url, function(error, data){
 	    .y(function(d){ return yScale(d.lecturer); })
 	    .curve(d3.curveCardinal); 
 
-	var svg = d3.select('body').append('svg').attr('width', w).attr('height', h);
+	var svg = d3.select('body').append('svg')
+	    .attr('width', width)
+	    .attr('height', height);
 
 	var lineChart1 = svg.append("g").append("path")
 	    .attr("class", "line")
@@ -115,18 +132,84 @@ d3.csv(url, function(error, data){
 	    .attr("class", "line")
 	    .attr("stroke", colorset[3])
 	    .attr("d", function(d){ return line_lecturer(data); });
-
+	
+	var linestyle = svg.selectAll("path")
+	    .attr("transform", "translate(" + padding.left + "," + padding.top + ")");
+	
+	
+	
 	//Axis
 	// Tick format: http://www.oxxostudio.tw/articles/201501/svg-d3-12-formatting.html
 	
 	var yAxis = d3.axisLeft(yScale);
 	var xAxis = d3.axisBottom(xScale);
-	var XaxisAppend = svg.append("g").attr("class", "axis").attr("transform", "translate(0, "+(h-n)+")").call(xAxis.tickFormat(d3.format("d")));
-	var YaxisAppend = svg.append("g").attr("class", "axis").attr("transform", "translate("+n+", 0)").call(yAxis);
+	var XaxisAppend = svg.append("g")
+	    .attr("class", "axis")
+	    //.attr("transform", "translate(0, "+(h-n)+")")
+	    .attr("transform", "translate(" + padding.left + "," + (height - padding.bottom) + ")")
+	    .call(xAxis.tickFormat(d3.format("d")));
+	var YaxisAppend = svg.append("g")
+	    .attr("class", "axis")
+	    .attr("transform", "translate(" + padding.left + "," + padding.top + ")")
+	    //.attr("transform", "translate("+n+", 0)")
+	    .call(yAxis);
 		
 
+	//Focus and onMouse events
+
+	var focusDot = svg.append("g")
+	    .attr("class", "focusDot")
+	    .style("display", "none");
+
+	focusDot.append("circle")
+	    .attr("fill", "white")
+	    .attr("r", 4.5);
+
+	focusDot.append("text")
+	    .attr("dx", 10)
+	    .attr("dy", "1em");
+
+
+
+	var tracker = svg.append("rect")
+	    .attr("class", "overlay")
+	    .attr("x", padding.left)
+	    .attr("y", padding.top)
+	    .attr("width", width - padding.left - padding.right)
+	    .attr("height", height - padding.top - padding.bottom)
+	    .on("mouseover", function(){
+		focusDot.style("display", null);
+	    })
+	    .on("mouseout", function(){
+		focusDot.style("display", "none");
+	    })
+	    .on("mousemove", mousemove);
+
+	function mousemove(){
+	    var mouseX = d3.mouse(this)[0] - padding.left;
+	    var mouseY = d3.mouse(this)[1] - padding.top;
+
+	    var x0 = parseInt( xScale.invert( mouseX ) );
+	    var y0 = yScale.invert( mouseY );
+		
+	    var bisect = d3.bisector( function(d){ return d.year; }).left;
+	    var index = bisect(data, x0);
+	    
+	    var x1 = data[index].year;
+	    var y1 = data[index].professor;
+	    
+	    var focusX = xScale(x1) + padding.left;
+	    var focusY = yScale(y1) + padding.top;
+
+	    focusDot.attr("transform", "translate(" + focusX + "," + focusY + ")");
+
+	    focusDot.select("text")
+		.text("Year:" + x1 + ", Num:" + y1)
+		.attr("fill", "white");
+
+	}
 	
-	});
+});
 
 
 </script>
