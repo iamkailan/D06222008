@@ -241,6 +241,31 @@ d3.csv(url, function(error, data){
 
 	}
 	
+	// Legend
+	var legend = svg.append("rect")
+	    .attr("class", "legend")
+	    .attr("x", 2*padding.left)
+	    .attr("y", 2*padding.top)
+	    .attr("width", 150)
+	    .attr("height", 150)
+	    .attr("rx", 10)
+	    .attr("ry", 10)
+	    .attr("fill", "none")
+	    .attr("stroke", "white")
+	    .attr("stroke-width", 1);
+	
+	var marker1 = legend.append("circle")
+	    .attr("x", 2*padding.left + 10)
+	    .attr("y", 2*padding.top + 10)
+	    .attr("r", 100)
+	    .attr("fill", colorset[0]);
+	    //.attr("dx", 10)
+	    //.attr("dy", "1em");
+
+	
+     
+
+
 	// Title	
 	svg.append("text").attr("x", (width / 2)).attr("y", padding.top)
 	    .attr("text-anchor", "middle").style("font-size", "2em")
