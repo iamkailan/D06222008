@@ -32,7 +32,8 @@
 	.text{
 	    fill: white;
 	    font-size: 12;
-	}		
+	}
+	
     </style>
 </head>
 <body>
@@ -51,6 +52,7 @@ d3.csv(url, function(error, data){
 	var num_assistant = [];
 	var num_lecturer = [];	
 	
+	// color: blue, red, yellow, green	
 	var colorset = ["#29b6f6", "#E34247", "#FEB32E", "#3bcec0"];
 		
 	//  Fixed issue: return wrong value of d3.max and d3.min 
@@ -160,11 +162,18 @@ d3.csv(url, function(error, data){
 	var focusDot = svg.append("g")
 	    .attr("class", "focusDot")
 	    .style("display", "none");
-
-	focusDot.append("circle")
-	    .attr("fill", "white")
-	    .attr("r", 4.5);
-
+	
+	var dot1 = focusDot.append("circle").attr("stroke", colorset[0]);
+	var dot2 = focusDot.append("circle").attr("stroke", colorset[1]);
+	var dot3 = focusDot.append("circle").attr("stroke", colorset[2]);
+	var dot4 = focusDot.append("circle").attr("stroke", colorset[3]);
+	
+	var dot_attribute = svg.selectAll("circle")
+	    .attr("r", 7)
+	    .attr("stroke-width", 3)
+	    .attr("fill", "#2C2C39");
+	
+	
 	focusDot.append("text")
 	    .attr("dx", 10)
 	    .attr("dy", "1em");
@@ -196,25 +205,35 @@ d3.csv(url, function(error, data){
 
 	function mousemove(){
 	    var mouseX = d3.mouse(this)[0] - padding.left;
-	    var mouseY = d3.mouse(this)[1] - padding.top;
-
+	    //var mouseY = d3.mouse(this)[1] - padding.top;
+	    
 	    var x0 = parseInt( xScale.invert( mouseX ) );
-	    var y0 = yScale.invert( mouseY );
+	    //var y0 = yScale.invert( mouseY );
 		
 	    var bisect = d3.bisector( function(d){ return d.year; }).left;
 	    var index = bisect(data, x0);
 	    
 	    var x1 = data[index].year;
 	    var y1 = data[index].professor;
-	    
+	    var y2 = data[index].associate; 
+	    var y3 = data[index].assistant; 
+	    var y4 = data[index].lecturer;
+
+
 	    var focusX = xScale(x1) + padding.left;
-	    var focusY = yScale(y1) + padding.top;
+	    var focusY1 = yScale(y1) + padding.top;
+	    var focusY2 = yScale(y2) + padding.top;
+	    var focusY3 = yScale(y3) + padding.top;
+	    var focusY4 = yScale(y4) + padding.top;
 
-	    focusDot.attr("transform", "translate(" + focusX + "," + focusY + ")");
-
-	    focusDot.select("text")
-		.text("Year:" + x1 + ", Num:" + y1)
-		.attr("fill", "white");
+	    dot1.attr("transform", "translate(" + focusX + "," + focusY1 + ")");
+	    dot2.attr("transform", "translate(" + focusX + "," + focusY2 + ")");
+	    dot3.attr("transform", "translate(" + focusX + "," + focusY3 + ")");
+	    dot4.attr("transform", "translate(" + focusX + "," + focusY4 + ")");
+	    
+	    //focusDot.select("text")
+//		.text("Year:" + x1 + ", Num:" + y1)
+//		.attr("fill", "white");
 
 	    ver_line.attr("x1", focusX)
 		.attr("y1", padding.top)
