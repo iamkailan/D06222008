@@ -139,7 +139,11 @@ d3.csv(url, function(error, data){
 	    .attr("transform", "translate(" + padding.left + "," + padding.top + ")");
 	
 	
-	
+	// Title	
+	svg.append("text").attr("x", (width / 2)).attr("y", 0 - (padding.top / 2))
+	    .attr("text-anchor", "middle").style("font-size:", "16px")
+	    .text("")
+
 	//Axis
 	// Tick format: http://www.oxxostudio.tw/articles/201501/svg-d3-12-formatting.html
 	
