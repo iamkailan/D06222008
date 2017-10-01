@@ -41,7 +41,7 @@
 <script>
 url = "https://ntu-csx-d3js.github.io/D06222008/hw2_2.csv"
 d3.csv(url, function(error, data){
-	//console.log(data);
+	console.log(data);
 	if(error){
 	    console.log(error);
 	}
@@ -167,10 +167,11 @@ d3.csv(url, function(error, data){
 	var dot3 = focusDot.append("circle").attr("stroke", colorset[2]);
 	var dot4 = focusDot.append("circle").attr("stroke", colorset[3]);
 	
-	var dot_attribute = svg.selectAll("circle")
+	var dot_attribute = svg.select(".focusDot").selectAll("circle")
 	    .attr("r", 7)
 	    .attr("stroke-width", 3)
-	    .attr("fill", "#2C2C39");
+	    .attr("fill", "white");
+	    //.attr("fill", "#2C2C39");
 	
 	
 	focusDot.append("text")
@@ -195,10 +196,12 @@ d3.csv(url, function(error, data){
 	    .on("mouseover", function(){
 		focusDot.style("display", null);
 		focusLine.style("display", null);
+		statText.style("display", null);
 	    })
 	    .on("mouseout", function(){
 		focusDot.style("display", "none");
 		focusLine.style("display", "none");
+		statText.style("diaplay", "none");
 	    })
 	    .on("mousemove", mousemove);
 
@@ -230,6 +233,10 @@ d3.csv(url, function(error, data){
 	    dot3.attr("transform", "translate(" + focusX + "," + focusY3 + ")");
 	    dot4.attr("transform", "translate(" + focusX + "," + focusY4 + ")");
 	    
+	    stat1.text(y1).attr("fill", "white");
+	    stat2.text(y2).attr("fill", "white");
+	    stat3.text(y3).attr("fill", "white");
+	    stat4.text(y4).attr("fill", "white");
 	    //focusDot.select("text")
 //		.text("Year:" + x1 + ", Num:" + y1)
 //		.attr("fill", "white");
@@ -242,6 +249,7 @@ d3.csv(url, function(error, data){
 	}
 	
 	// Legend
+	/*
 	var legend = svg.append("rect")
 	    .attr("class", "legend")
 	    .attr("x", 2*padding.left)
@@ -253,17 +261,54 @@ d3.csv(url, function(error, data){
 	    .attr("fill", "none")
 	    .attr("stroke", "white")
 	    .attr("stroke-width", 1);
-	
-	var marker1 = legend.append("circle")
-	    .attr("x", 2*padding.left + 10)
-	    .attr("y", 2*padding.top + 10)
-	    .attr("r", 100)
-	    .attr("fill", colorset[0]);
-	    //.attr("dx", 10)
-	    //.attr("dy", "1em");
+	*/
+	var colorLebel = svg.append("g")
+	    .attr("class", "colorLabel")
+	    .style("display", null);
 
+	var label1 = colorLebel.append("circle").attr("fill", colorset[0])
+	    .attr("cy", 2*padding.top);
+	var label2 = colorLebel.append("circle").attr("fill", colorset[1])
+	    .attr("cy", 3*padding.top);
+	var label3 = colorLebel.append("circle").attr("fill", colorset[2])
+	    .attr("cy", 4*padding.top);
+	var label4 = colorLebel.append("circle").attr("fill", colorset[3])
+	    .attr("cy", 5*padding.top);
 	
+	var label_attribute = colorLebel.selectAll("circle")
+	    .attr("cx", 2.5*padding.left)
+	    .attr("r", 7);
+
+	var text1 = colorLebel.append("text").text("教授：").attr("dy", 5);
+	var text2 = colorLebel.append("text").text("副教授：").attr("dy", padding.top+5);
+	var text3 = colorLebel.append("text").text("助理教授：").attr("dy", 2*padding.top+5)
+	var text4 = colorLebel.append("text").text("講師：").attr("dy", 3*padding.top+5);	
+
+	var text_attribute = colorLebel.selectAll("text")
+	    .style("text-anchor", "start")
+	    .attr("x", 3*padding.left - 10)
+	    .attr("y", 2*padding.top)
+	    .attr("fill", "white")
+	    .attr("font-weight", "100");
+
+   	
+	var statText = svg.append("g")
+	    .attr("class", "statText")
+	    .style("display", "none");
+
+	var stat1 = statText.append("text").text("test1").attr("dy", 5);
+	var stat2 = statText.append("text").text("test2").attr("dy", padding.top+5);
+	var stat3 = statText.append("text").text("test3").attr("dy", 2*padding.top+5);
+	var stat4 = statText.append("text").text("test4").attr("dy", 3*padding.top+5);
+	var stat_attribute = statText.selectAll("text")
+	    .style("text-anchor", "start")
+	    .attr("x", 4.5*padding.left)
+	    .attr("y", 2*padding.top)
+	    .attr("fill", "white")
+	    .attr("font-weight", "100");
      
+
+
 
 
 	// Title	
