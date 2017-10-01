@@ -146,13 +146,11 @@ d3.csv(url, function(error, data){
 	var xAxis = d3.axisBottom(xScale);
 	var XaxisAppend = svg.append("g")
 	    .attr("class", "axis")
-	    //.attr("transform", "translate(0, "+(h-n)+")")
 	    .attr("transform", "translate(" + padding.left + "," + (height - padding.bottom) + ")")
 	    .call(xAxis.tickFormat(d3.format("d")));
 	var YaxisAppend = svg.append("g")
 	    .attr("class", "axis")
 	    .attr("transform", "translate(" + padding.left + "," + padding.top + ")")
-	    //.attr("transform", "translate("+n+", 0)")
 	    .call(yAxis);
 		
 
@@ -170,8 +168,7 @@ d3.csv(url, function(error, data){
 	var dot_attribute = svg.select(".focusDot").selectAll("circle")
 	    .attr("r", 7)
 	    .attr("stroke-width", 3)
-	    .attr("fill", "white");
-	    //.attr("fill", "#2C2C39");
+	    .attr("fill", "#2C2C39");
 	
 	
 	focusDot.append("text")
@@ -186,6 +183,23 @@ d3.csv(url, function(error, data){
 	    .style("stroke-dasharray", ("3,3"))
 	    .attr("stroke-width", 1)
 	    .attr("stroke", "white");
+	
+	focusLine.append("rect")
+	    .attr("width", 60)
+	    .attr("height", 30)
+	    .attr("fill", "white")
+	    .attr("rx", 5)
+	    .attr("ry", 5)
+	    .attr("opacity", 0.7);	    
+
+	focusLine.append("text")
+	    .attr("dx", 17)
+	    .attr("dy", 22)
+	    .attr("text-anchor", "start")
+	    .attr("fill", "black")
+	    .attr("font-size", "20px")
+	    .attr("font-weight", 200);
+    
 
 	var tracker = svg.append("rect")
 	    .attr("class", "overlay")
@@ -197,17 +211,19 @@ d3.csv(url, function(error, data){
 		focusDot.style("display", null);
 		focusLine.style("display", null);
 		statText.style("display", null);
+		//tooltip.style("display", null);
 	    })
 	    .on("mouseout", function(){
 		focusDot.style("display", "none");
 		focusLine.style("display", "none");
 		statText.style("diaplay", "none");
+		//tooltip.style("display", "none");
 	    })
 	    .on("mousemove", mousemove);
 
 	function mousemove(){
 	    var mouseX = d3.mouse(this)[0] - padding.left;
-	    //var mouseY = d3.mouse(this)[1] - padding.top;
+	    var mouseY = d3.mouse(this)[1] - padding.top;
 	    
 	    var x0 = parseInt( xScale.invert( mouseX ) );
 	    //var y0 = yScale.invert( mouseY );
@@ -237,14 +253,26 @@ d3.csv(url, function(error, data){
 	    stat2.text(y2).attr("fill", "white");
 	    stat3.text(y3).attr("fill", "white");
 	    stat4.text(y4).attr("fill", "white");
-	    //focusDot.select("text")
-//		.text("Year:" + x1 + ", Num:" + y1)
-//		.attr("fill", "white");
 
-	    ver_line.attr("x1", focusX)
-		.attr("y1", padding.top)
+	    //tooltip.attr("transform", "translate(" + mouseX + "," + mouseY + ")");
+	   // tooltip.style("left", (d3.event.pageX) + "px")
+	//	.style("top", (d3.event.pageY) + "px");
+	    //tooltip.select("text").text(x1).attr("fill", "white");
+	    
+	    focusLine.select("line")
+		.attr("x1", focusX)
+		.attr("y1", padding.top + 10)
 		.attr("x2", focusX)
 		.attr("y2", height - padding.bottom);
+	    
+	    focusLine.select("rect")
+		.attr("x", mouseX - 20)
+		.attr("y", mouseY);
+
+	    focusLine.select("text")
+		.attr("x", mouseX - 30)
+		.attr("y", mouseY)
+		.text(x1);
 
 	}
 	
@@ -262,6 +290,24 @@ d3.csv(url, function(error, data){
 	    .attr("stroke", "white")
 	    .attr("stroke-width", 1);
 	*/
+	var tooltip = svg.append("g")
+	    .attr("class", "tooltip")
+	    .style("display", "none");
+	   
+	tooltip.append("rect").attr("width", 100).attr("height", 50)
+	    .attr("rx", 10)
+	    .attr("ry", 10)
+	    .attr("fill", "white")
+	    .attr("opacity", 0.3);
+	   
+	tooltip.append("text")
+	    //.attr("x", 2*padding.left)
+	    //.attr("y", 2*padding.top)
+	    .attr("fill", "white")
+	    .attr("font-size", "18px");
+	
+	
+	
 	var colorLebel = svg.append("g")
 	    .attr("class", "colorLabel")
 	    .style("display", null);
@@ -310,10 +356,9 @@ d3.csv(url, function(error, data){
 
 
 
-
 	// Title	
 	svg.append("text").attr("x", (width / 2)).attr("y", padding.top)
-	    .attr("text-anchor", "middle").style("font-size", "2em")
+	    .attr("text-anchor", "middle").style("font-size", "1.5em")
 	    .attr("fill", "white")
 	    .style("font-weight", 100)
 	    .text("台大歷年專任教研人員人數");
