@@ -1,0 +1,241 @@
+
+<meta charset="utf-8">
+<style>
+body{
+  font-family: "Helvetica Neue";
+  position: relative;
+}
+svg{
+  position: absolute;
+  margin:auto;
+  text-align:center;
+  width: 100%;
+  height: 100%;
+}
+.follow-me{
+  position:absolute;
+  font-size:1.25em;
+  font-weight:100;
+  bottom:20px;
+  right:50px;
+  text-decoration: none;
+  color: gray;
+}
+
+</style>
+
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+
+<script>
+var dataset = [ 
+{ department:"資工", population:11}, 
+{department:"機械", population:13}, 
+{department:"電機", population:14},
+{department:"化工", population:4}, 
+{department:"醫學", population:9},
+{department:"法律", population:4},
+{department:"財金", population:4},
+{department:"化學", population:5},
+{department:"圖資", population:2},
+{department:"物理", population:2},
+{department:"社會", population:1},
+{department:"土木", population:3},
+{department:"森林", population:1},
+{department:"工海", population:2},
+{department:"物治", population:2},
+{department:"生工", population:3},
+{department:"職治", population:1},
+{department:"地質", population:5},
+{department:"護理", population:1},
+{department:"昆蟲", population:1},
+{department:"會計", population:3},
+{department:"工管", population:2},
+{department:"生科", population:1},
+{department:"生機", population:1},
+{department:"材料", population:3},
+{department:"農化", population:1},
+{department:"數學", population:5},
+{department:"國企", population:1},
+{department:"哲學", population:1},
+{department:"生傳", population:2},
+{department:"獸醫", population:2},
+{department:"心理", population:2},
+{department:"公衛", population:1},
+{department:"藥學", population:1},
+];
+
+// *** Make svg canvas and its parameters
+var svg = d3.select("body").append("svg").append("g")
+var color = d3.scale.category20();
+
+var width = 1000
+var height = 600
+var padding = { top: 50, right:50, bottom:50, left:50};
+
+var canvas_w = width - padding.left - padding.right;
+var canvas_h = height - padding.top - padding.bottom;
+var radius = Math.min(canvas_w, canvas_h) / 2;
+
+
+// *** pie data transformer
+var pie = d3.layout.pie()
+  .sort(null)
+  .value(function(d){ 
+    return d.population;
+  });
+
+var piedata = pie(dataset);
+console.log(piedata);
+
+// *** arc generator
+var gen_arc = d3.svg.arc()
+  .innerRadius(radius * 0.25)
+  .outerRadius(radius * 0.7);
+
+var arcs = svg.selectAll("g")
+  .data(piedata)
+  .enter()
+  .append("g")
+  .attr("transform", "translate(" + width/2 + "," + height/1.8 + ")" );
+
+
+// *** Add elements to arcs
+arcs.append("path")
+  .attr("fill", function(d,i){
+    return color(i);
+  })
+  .attr("opacity", 0.7)
+  .attr("d", function(d){
+    return gen_arc(d);
+  }) 
+  .on("mouseout", function(d,i){
+      center_population.text("0");
+      center_ratio.text("0%");
+      
+      d3.select(departments[0][i]).transition()
+	.duration(250)
+	.attr("font-size", "16px")
+	.attr("fill", "lightgray");
+      
+      d3.select(link_line[0][i]).transition()
+	.duration(250)
+	.attr("opacity", 0.2)
+	.attr("stroke", "gray");
+
+      d3.select(this).transition()
+	.duration(250)
+	.attr("opacity", 0.7)
+	.attr("d", gen_arc.outerRadius(radius * 0.7))
+	.attr("fill", color(i));
+  })
+  .on("mouseover", function(d,i){
+      center_population.text(d.value);
+      var percent = Number(d.value) / d3.sum(dataset, function(d){return d.population;}) * 100;
+      center_ratio.text(percent.toFixed(1) + "%");
+      
+      //      index i = 0  1  2  3  4  5 ...
+      // color_change = 0  0  2  2  4  4 ...
+      var color_change = i - (i % 2);
+      
+      d3.select(departments[0][i]).transition()
+	.duration(250)
+	.attr("font-size", "24px")
+	.attr("fill", color(color_change));
+      
+      d3.select(link_line[0][i]).transition()
+	.duration(250)
+	.attr("opacity", 0.2)
+	.attr("stroke", "black");
+
+      d3.select(this).transition()
+	.duration(250)
+	.attr("opacity", 1.0)
+	.attr("d", gen_arc.outerRadius(radius * 0.72))
+	.attr("fill", color(color_change));
+  });
+
+
+// *** Centered text and data
+var h_line1 = height/2 + 25;
+var h_line2 = height/2 + 55;
+var w_left = width/2 + 2;
+var w_right = width/2 + 4;
+
+var center_text1 = svg.append("text")
+  .attr("font-size", "16px")
+  .attr("fill", "gray")
+  .attr("text-anchor", "end")
+  .attr("transform", "translate(" + w_left + "," + h_line1 + ")")
+  .text("人數:");
+
+var center_text2 = svg.append("text")
+  .attr("font-size", "16px")
+  .attr("fill", "gray")
+  .attr("text-anchor", "end")
+  .attr("transform", "translate(" + w_left + "," + h_line2 + ")")
+  .text("比例:");
+
+var center_population = svg.append("text")
+  .attr("font-size", "16px")
+  .attr("fill", "gray")
+  .attr("text-anchor", "start")
+  .attr("transform", "translate(" + w_right + "," + h_line1 + ")")
+  .text("0");
+
+var center_ratio = svg.append("text")
+  .attr("font-size", "16px")
+  .attr("fill", "gray")
+  .attr("text-anchor", "start")
+  .attr("transform", "translate(" + w_right + "," + h_line2 + ")")
+  .text("0%");
+
+
+// *** Peripheral text of departments
+// 	index i =  0  1  2  3  4  5 ...
+//    alternate = -1  1 -1  1 -1  1 ...
+//    To keep text in the same angle, y/x must remains the same.
+
+var departments = arcs.append("text")
+  .attr("transform", function(d,i){
+    var x = gen_arc.centroid(d)[0] * 2;
+    var y = gen_arc.centroid(d)[1] * 2;
+    var alternate = ((2*i) % 4) - 1;
+    var trX = x * (1 + alternate*0.09);
+    var trY = y * (1 + alternate*0.09);
+    return "translate(" + trX + "," + trY + ")";
+  })
+  .attr("fill", "lightgray")
+  .attr("text-anchor", "middle")
+  .attr("font-size", "16px")
+  .text(function(d){
+    return d.data.department;
+  });
+ 
+var link_line = arcs.append("line")
+  .attr("stroke", "gray")
+  .attr("opacity", 0.2)
+  .attr("stroke-width", "1px")
+  .attr("x1", function(d){ return gen_arc.centroid(d)[0] * 1.4; })
+  .attr("y1", function(d){ return gen_arc.centroid(d)[1] * 1.4; })
+  .attr("x2", function(d,i){ 
+    var alternate = ((2*i) % 4) - 1;
+    return gen_arc.centroid(d)[0] * 1.85 * (1 + alternate*0.1); 
+  })
+  .attr("y2", function(d,i){ 
+    var alternate = ((2*i) % 4) - 1;
+    return gen_arc.centroid(d)[1] * 1.85 * (1 + alternate*0.1); 
+  });
+
+
+// *** Title of the chart	
+svg.append("text").attr("x", (width / 2)).attr("y", 30)
+    .attr("text-anchor", "middle").style("font-size", "2em")
+    .attr("fill", "black")
+    .style("font-weight", 100)
+    .text("2017台大魔術社新生科系分布(大學部)");
+
+</script>
+<a class="follow-me" href="http://github.com/NTU-CSX-D3JS/D06222008">Wen-Han Kao | 淺談資料視覺化與D3.js</a>
+</body>
+</html>
