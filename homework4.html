@@ -4,23 +4,35 @@
 </head>
 
 <style>
+.follow-me{
+  position:absolute;
+  font-size:1.25em;
+  font-weight:100;
+  bottom:20px;
+  right:50px;
+  text-decoration: none;
+  color: gray;
+}
+
 </style>
 
 <body>
 <script>
 
 var width = 800;
-var height = 500;
-var margin = {top:50, right:50, bottom:50, left:50};
+var height = 600;
+var margin = {top:50, right:0, bottom:100, left:100};
 var w = width - margin.left - margin.right;
 var h = height - margin.top - margin.bottom;
 
+
 var x = d3.scaleBand()
-    .range([0,width])
+    .range([0,w])
     .padding(0.1);
 
 var y = d3.scaleLinear()
-    .range([height,0]);
+    .range([h,0]);
+
 
 var svg = d3.select("body").append("svg")
     .attr("width", width)
@@ -32,10 +44,9 @@ var parseTime = d3.timeParse("%Y-%m-%d %H:%M:%S");
 
 url = "https://ntu-csx-d3js.github.io/D06222008/ohlc_USDT_BTC20171014000000-20171011120000.csv"
 d3.text(url, function(data){
-	//console.log(data);
+	
 	var data_parse = d3.csvParse(data);
 	
-
 	data_parse.forEach(function(d){
 	    d.Date = parseTime(d.Date);
 	    d.buy_volume = parseInt(d.buy_volume);
@@ -43,13 +54,57 @@ d3.text(url, function(data){
 	});
 	console.log(data_parse);
     
-     
-	console.log(typeof data_parse[0].Date);
-	console.log(typeof data_parse[0].buy_volume);
-	console.log(data_parse[0].sell_volume);
+	x.domain(data_parse.map(function(d) { return d.Date;}));
+	xAxis = d3.axisBottom(x)
+	    //.ticks(3)
+	    //.ticks(d3.timeHour, 5)
+	    .tickFormat(d3.timeFormat("%m-%d %H:00"))
+	    ;
 
+	
+	y.domain([0, d3.max(data_parse, function(d) { return d.buy_volume;})*1.1]);
+
+	svg.selectAll("rect").data(data_parse)
+	    .enter()
+	    .append("rect")
+	    .attr("class", "bar")
+	    .attr("x", function(d) { return x(d.Date);})
+	    .attr("y", function(d) { return y(d.buy_volume);})
+	    .attr("width", x.bandwidth())
+	    .attr("height", function(d){ return h - y(d.buy_volume);})
+	    .attr("fill", "blue")
+	    .attr("opacity", 0.5)
+	    ;
+
+	svg.append("g")
+		.attr("transform", "translate(0," + h + ")" )
+		.call(xAxis)
+	    .selectAll("text")
+		.style("text-anchor", "end")
+		.attr("dx", "-0.8em")
+		.attr("dy", "-0.55em")
+		.attr("transform", "rotate(-90)");
+	
+	svg.append("g")
+	    .call(d3.axisLeft(y));
+
+	svg.append("text").attr("x", w/2).attr("y",0)
+	    .attr("text-anchor", "middle")
+	    .style("font-size", "1.8em")
+	    .attr("fill", "black")
+	    .style("font-weight", 100)
+	    .text("USDT-BTC Trade Volume (Poloniex)");
+
+	svg.append("text")
+	    .attr("transform", "translate(" + (margin.left - 100) + "," + (-10) + ")")
+	    .attr("text-anchor", "middle")
+	    .text("Volume (USDT)")
+	    .style("font-weight", 200)
+	    .attr("font-size", "16px")
+	    .attr("opacity", 0.8);
 
 });
 </script>
+<a class="follow-me" href="http://github.com/NTU-CSX-D3JS/D06222008">Wen-Han Kao | 淺談資料視覺化與D3.js</a>
 </body>
 </html>
