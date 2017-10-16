@@ -28,10 +28,15 @@ var h = height - margin.top - margin.bottom;
 
 var x = d3.scaleBand()
     .range([0,w])
-    .padding(0.1);
+    .paddingInner(0.05)
+    .align(0.1);
 
 var y = d3.scaleLinear()
     .range([h,0]);
+
+// test stack
+var keys = ["buy_volume", "sell_volume"];
+var z = d3.scaleOrdinal().range(["#21ed98", "#ed2143"]);
 
 
 var svg = d3.select("body").append("svg")
@@ -50,20 +55,39 @@ d3.text(url, function(data){
 	data_parse.forEach(function(d){
 	    d.Date = parseTime(d.Date);
 	    d.buy_volume = parseInt(d.buy_volume);
-	    d.sell_volume = parseInt(d.sell_volume);   
+	    d.sell_volume = parseInt(d.sell_volume) * -1;   
 	});
 	console.log(data_parse);
-    
+	//console.log(data_parse[0]); 
 	x.domain(data_parse.map(function(d) { return d.Date;}));
 	xAxis = d3.axisBottom(x)
 	    //.ticks(3)
 	    //.ticks(d3.timeHour, 5)
 	    .tickFormat(d3.timeFormat("%m-%d %H:00"))
 	    ;
+	
+	y.domain([0, d3.max(data_parse, function(d) { return (d.buy_volume + d.sell_volume)*1.1})]);
+
+	z.domain(keys);
+	// test stack
+	
+	var stackchart = svg.append("g")
+	.selectAll("g")
+	.data(d3.stack().keys(keys)(data_parse))
+	.enter().append("g")
+	  .attr("fill", function(d) { return z(d.key); })
+	  .attr("opacity", 0.8)
+	.selectAll("rect")
+	.data(function(d) { return d;})
+	.enter().append("rect")
+	.attr("x", function(d) { 
+	  return x(d.data.Date); })
+	.attr("y", function(d) { return y(d[1]); })
+	.attr("height", function(d) { return y(d[0]) - y(d[1]); })
+	.attr("width", x.bandwidth() );
 
 	
-	y.domain([0, d3.max(data_parse, function(d) { return d.buy_volume;})*1.1]);
-
+/*
 	svg.selectAll("rect").data(data_parse)
 	    .enter()
 	    .append("rect")
@@ -75,7 +99,7 @@ d3.text(url, function(data){
 	    .attr("fill", "blue")
 	    .attr("opacity", 0.5)
 	    ;
-
+*/
 	svg.append("g")
 		.attr("transform", "translate(0," + h + ")" )
 		.call(xAxis)
