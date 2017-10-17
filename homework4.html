@@ -19,9 +19,9 @@
 <body>
 <script>
 
-var width = 800;
+var width = 1000;
 var height = 600;
-var margin = {top:50, right:0, bottom:100, left:100};
+var margin = {top:50, right:100, bottom:100, left:100};
 var w = width - margin.left - margin.right;
 var h = height - margin.top - margin.bottom;
 
@@ -36,7 +36,7 @@ var y = d3.scaleLinear()
 
 // test stack
 var keys = ["buy_volume", "sell_volume"];
-var z = d3.scaleOrdinal().range(["#21ed98", "#ed2143"]);
+var z = d3.scaleOrdinal().range(["#20ed61", "#ed2143"]);
 
 
 var svg = d3.select("body").append("svg")
@@ -145,7 +145,7 @@ d3.text(url, function(data){
 	  .data(keys.slice().reverse())
 	  .enter().append("g")
 	    .attr("transform", function(d,i){
-	      return "translate(0," + (25 + i * 25) + ")";
+	      return "translate(0," + (50 + i * 25) + ")";
 	    });
 
 	legend.append("rect")
@@ -163,7 +163,7 @@ d3.text(url, function(data){
 	var monitor = svg.append("g")
 	    .attr("font-size", 12)
 	    .attr("text-anchor", "start")
-	    .attr("transform", "translate(0, 25)");
+	    .attr("transform", "translate(0, 30)");
 	
 	var mx1 = 20;
 	var mx2 = 115;
