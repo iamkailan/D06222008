@@ -63,7 +63,7 @@ d3.text(url, function(data){
 	xAxis = d3.axisBottom(x)
 	    //.ticks(3)
 	    //.ticks(d3.timeHour, 5)
-	    .tickFormat(d3.timeFormat("%m-%d %H:00"))
+	    .tickFormat(d3.timeFormat("%m/%d %H:00"))
 	    ;
 	
 	y.domain([0, d3.max(data_parse, function(d) { return (d.buy_volume + d.sell_volume)*1.1})]);
@@ -80,11 +80,22 @@ d3.text(url, function(data){
 	.selectAll("rect")
 	.data(function(d) { return d;})
 	.enter().append("rect")
-	.attr("x", function(d) { 
-	  return x(d.data.Date); })
-	.attr("y", function(d) { return y(d[1]); })
-	.attr("height", function(d) { return y(d[0]) - y(d[1]); })
-	.attr("width", x.bandwidth() );
+	  .attr("x", function(d) { 
+	    return x(d.data.Date); })
+	  .attr("y", function(d) { return y(d[1]); })
+	  .attr("height", function(d) { return y(d[0]) - y(d[1]); })
+	  .attr("width", x.bandwidth() )
+	  
+	  .on("mouseover", function() { tooltip.style("display", null);})
+	  .on("mouseout", function() { tooltip.style("display", "none");})
+	  .on("mousemove", function(d){
+	    tooltip.style("display", null);
+	    var trX = d3.mouse(this)[0];
+	    var trY = d3.mouse(this)[1] - 10;
+	    tooltip.attr("transform", "translate(" + trX + "," + trY + ")");
+	    tooltip.select("text").text(d[1] - d[0]);
+	  });
+	  
 
 	
 /*
@@ -127,7 +138,54 @@ d3.text(url, function(data){
 	    .attr("font-size", "16px")
 	    .attr("opacity", 0.8);
 
+      
+	var legend = svg.append("g")
+	    .attr("font-size", 12)
+	    .attr("text-anchor", "end")
+	  .selectAll("g")
+	  .data(keys.slice().reverse())
+	  .enter().append("g")
+	    .attr("transform", function(d,i){
+	      return "translate(0," + (25 + i * 25) + ")";
+	    });
+
+	legend.append("rect")
+	  .attr("x", w - 20)
+	  .attr("width", 20)
+	  .attr("height", 20)
+	  .attr("fill", z);
+
+	legend.append("text")
+	  .attr("x", w - 30)
+	  .attr("y", 10)
+	  .attr("dy", "0.32em")
+	  .text(function(d) { return d;});
+
+	var tooltip = svg.append("g")
+	  .attr("class", "tooltip")
+	  .style("display", "none");
+
+
+	tooltip.append("rect")
+	  .attr("width", 70)
+	  .attr("height", 20)
+	  .attr("fill", "black")
+	  .attr("opacity", 0.6);
+
+	tooltip.append("text")
+	  .attr("x", 35)
+	  .attr("dy", "1.2em")
+	  .attr("fill", "white")
+	  .style("text-anchor", "middle")
+	  .attr("font-size", 12)
+	  .attr("font-weight", 100);
+
+
+
 });
+
+
+
 </script>
 <a class="follow-me" href="http://github.com/NTU-CSX-D3JS/D06222008">Wen-Han Kao | 淺談資料視覺化與D3.js</a>
 </body>
