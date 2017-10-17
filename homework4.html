@@ -55,7 +55,12 @@ d3.text(url, function(data){
 	data_parse.forEach(function(d){
 	    d.Date = parseTime(d.Date);
 	    d.buy_volume = parseInt(d.buy_volume);
-	    d.sell_volume = parseInt(d.sell_volume) * -1;   
+	    d.sell_volume = parseInt(d.sell_volume) * -1;
+	    d.Open = parseFloat(d.Open);
+	    d.Close = parseFloat(d.Close);
+	    d.High = parseFloat(d.High);
+	    d.Low = parseFloat(d.Low);
+	    d.EMA = parseFloat(d.EMA);
 	});
 	console.log(data_parse);
 	//console.log(data_parse[0]); 
@@ -69,7 +74,6 @@ d3.text(url, function(data){
 	y.domain([0, d3.max(data_parse, function(d) { return (d.buy_volume + d.sell_volume)*1.1})]);
 
 	z.domain(keys);
-	// test stack
 	
 	var stackchart = svg.append("g")
 	.selectAll("g")
@@ -86,8 +90,18 @@ d3.text(url, function(data){
 	  .attr("height", function(d) { return y(d[0]) - y(d[1]); })
 	  .attr("width", x.bandwidth() )
 	  
-	  .on("mouseover", function() { tooltip.style("display", null);})
-	  .on("mouseout", function() { tooltip.style("display", "none");})
+	  .on("mouseover", function(d) { 
+	    tooltip.style("display", null);
+	    mo.text(d.data.Open);
+	    mc.text(d.data.Close);
+	    mh.text(d.data.High);
+	    ml.text(d.data.Low);
+	    me.text(d.data.EMA);
+	    mv.text(d.data.buy_volume + d.data.sell_volume); 
+	  })
+	  .on("mouseout", function() { 
+	    tooltip.style("display", "none");
+	  })
 	  .on("mousemove", function(d){
 	    tooltip.style("display", null);
 	    var trX = d3.mouse(this)[0];
@@ -96,21 +110,6 @@ d3.text(url, function(data){
 	    tooltip.select("text").text(d[1] - d[0]);
 	  });
 	  
-
-	
-/*
-	svg.selectAll("rect").data(data_parse)
-	    .enter()
-	    .append("rect")
-	    .attr("class", "bar")
-	    .attr("x", function(d) { return x(d.Date);})
-	    .attr("y", function(d) { return y(d.buy_volume);})
-	    .attr("width", x.bandwidth())
-	    .attr("height", function(d){ return h - y(d.buy_volume);})
-	    .attr("fill", "blue")
-	    .attr("opacity", 0.5)
-	    ;
-*/
 	svg.append("g")
 		.attr("transform", "translate(0," + h + ")" )
 		.call(xAxis)
@@ -160,11 +159,32 @@ d3.text(url, function(data){
 	  .attr("y", 10)
 	  .attr("dy", "0.32em")
 	  .text(function(d) { return d;});
+	
+	var monitor = svg.append("g")
+	    .attr("font-size", 12)
+	    .attr("text-anchor", "start")
+	    .attr("transform", "translate(0, 25)");
+	
+	var mx1 = 20;
+	var mx2 = 115;
+	monitor.append("text").attr("x", mx1).attr("dy", 10).text("Open price:");
+	monitor.append("text").attr("x", mx1).attr("dy", 35).text("Close price");
+	monitor.append("text").attr("x", mx1).attr("dy", 60).text("High price:"); 
+	monitor.append("text").attr("x", mx1).attr("dy", 85).text("Low price:");		
+	monitor.append("text").attr("x", mx1).attr("dy", 110).text("EMA price:");
+	monitor.append("text").attr("x", mx1).attr("dy", 135).text("Trade volume:");
+	
+	var 
+	mo = monitor.append("text").attr("x", mx2).attr("dy", 10).text("0"),
+	mc = monitor.append("text").attr("x", mx2).attr("dy", 35).text("0"),
+	mh = monitor.append("text").attr("x", mx2).attr("dy", 60).text("0"),
+	ml = monitor.append("text").attr("x", mx2).attr("dy", 85).text("0"),
+	me = monitor.append("text").attr("x", mx2).attr("dy", 110).text("0"),
+	mv = monitor.append("text").attr("x", mx2).attr("dy", 135).text("0");
 
 	var tooltip = svg.append("g")
 	  .attr("class", "tooltip")
 	  .style("display", "none");
-
 
 	tooltip.append("rect")
 	  .attr("width", 70)
@@ -180,11 +200,7 @@ d3.text(url, function(data){
 	  .attr("font-size", 12)
 	  .attr("font-weight", 100);
 
-
-
 });
-
-
 
 </script>
 <a class="follow-me" href="http://github.com/NTU-CSX-D3JS/D06222008">Wen-Han Kao | 淺談資料視覺化與D3.js</a>
